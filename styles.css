@@ -1,0 +1,818 @@
+/* Recent Google Reviews — badge styles. Everything is namespaced under .rgr-root. */
+
+.rgr-root,
+.rgr-tooltip,
+.rgr-modal,
+.rgr-notice {
+  --rgr-modal-bg: #ffffff;
+  --rgr-modal-border: #dadce0;
+  --rgr-scrim: rgba(32, 33, 36, 0.6);
+  --rgr-chip-bg: #f1f3f4;
+  --rgr-bg: #f1f3f4;
+  --rgr-border: #dadce0;
+  --rgr-text: #3c4043;
+  --rgr-muted: #5f6368;
+  --rgr-star: #f9ab00;
+  --rgr-positive: #188038;
+  --rgr-negative: #d93025;
+  --rgr-tip-bg: #ffffff;
+  --rgr-tip-shadow: 0 2px 8px rgba(60, 64, 67, 0.3), 0 1px 2px rgba(60, 64, 67, 0.3);
+  --rgr-skel: #dadce0;
+  --rgr-skel-hi: #f1f3f4;
+}
+
+.rgr-root {
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
+  margin: 8px 0 14px; /* 8px under the rating row, 14px clear of whatever follows (e.g. the photo grid) */
+  max-width: 100%;
+  font: 500 13px/18px "Google Sans", Roboto, Arial, sans-serif;
+  color: var(--rgr-text);
+}
+
+/* Theme is set by the renderer: the system setting on Google Search, always light on Google Maps (which has no dark mode on the web). */
+.rgr-root[data-rgr-theme="dark"],
+.rgr-tooltip[data-rgr-theme="dark"],
+.rgr-notice[data-rgr-theme="dark"] {
+  --rgr-modal-bg: #202124;
+  --rgr-modal-border: #3c4043;
+  --rgr-scrim: rgba(0, 0, 0, 0.65);
+  --rgr-chip-bg: #303134;
+  --rgr-bg: #303134;
+  --rgr-border: #5f6368;
+  --rgr-text: #e8eaed;
+  --rgr-muted: #9aa0a6;
+  --rgr-star: #fdd663;
+  --rgr-positive: #81c995;
+  --rgr-negative: #f28b82;
+  --rgr-tip-bg: #3c4043;
+  --rgr-tip-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  --rgr-skel: #4a4d51;
+  --rgr-skel-hi: #6b6f74;
+}
+
+.rgr-root .rgr-badge {
+  display: inline-flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--rgr-border);
+  border-radius: 12px;
+  background: var(--rgr-bg);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.rgr-root .rgr-badge:hover,
+.rgr-root.rgr-open .rgr-badge {
+  border-color: var(--rgr-muted);
+}
+
+.rgr-root .rgr-badge:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 1px;
+}
+
+/* Idle: nothing calculated and nothing about to be: a plain call to action. */
+.rgr-root[data-rgr-state="idle"] .rgr-badge,
+.rgr-root[data-rgr-state="unsupported"] .rgr-badge {
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 12px;
+  border-radius: 14px;
+}
+
+/* Unsupported layout: a quiet note that may wrap on a narrow screen, and is not a control. */
+.rgr-root[data-rgr-state="unsupported"] .rgr-badge {
+  white-space: normal;
+  cursor: default;
+  text-align: left;
+}
+
+.rgr-root[data-rgr-state="unsupported"] .rgr-meta {
+  color: var(--rgr-muted);
+  font-weight: 500;
+}
+
+.rgr-screen-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--rgr-muted);
+}
+
+.rgr-root .rgr-star {
+  color: var(--rgr-star);
+}
+
+.rgr-root[data-rgr-state="idle"] .rgr-meta {
+  color: var(--rgr-text);
+  font-weight: 500;
+}
+
+/* The trend strip: [overall direction] | 1M | 3M | 6M, each with its rating and a ticker arrow against the all-time rating. */
+.rgr-lead {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  border-right: 1px solid var(--rgr-border);
+}
+
+.rgr-lead .rgr-trend-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.rgr-cells {
+  display: flex;
+}
+
+.rgr-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  box-sizing: border-box;
+  min-width: 84px;
+  padding: 5px 12px;
+  border-left: 1px solid var(--rgr-border);
+}
+
+.rgr-cell:first-child {
+  border-left: 0;
+}
+
+.rgr-cell-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--rgr-muted);
+  font: 400 10.5px/14px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-cell-label {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.rgr-cell-main {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.rgr-cell-value {
+  font: 700 16px/20px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-cell-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--rgr-muted);
+  font: 700 12px/16px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-cell-delta .rgr-trend-icon {
+  width: 11px;
+  height: 11px;
+}
+
+.rgr-cell[data-rgr-dir="up"] .rgr-cell-delta,
+.rgr-lead[data-rgr-dir="up"] { color: var(--rgr-positive); }
+.rgr-cell[data-rgr-dir="down"] .rgr-cell-delta,
+.rgr-lead[data-rgr-dir="down"] { color: var(--rgr-negative); }
+.rgr-lead[data-rgr-dir="flat"] { color: var(--rgr-muted); }
+
+/* Too few reviews to mean much: shown, but quiet. */
+.rgr-cell.rgr-dim .rgr-cell-value {
+  color: var(--rgr-muted);
+  font-weight: 500;
+}
+
+/* Loading stopped before this window's far end: the number is for the newest reviews only. A dotted underline adds no width, so nothing shifts. */
+.rgr-cell.rgr-partial .rgr-cell-value {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+/* Skeleton icons: same size, in the skeleton colour. */
+.rgr-root .rgr-skel-icon,
+.rgr-root .rgr-skel-icon .rgr-trend-icon {
+  color: var(--rgr-skel);
+}
+
+/* Tooltip */
+.rgr-tooltip {
+  position: fixed;
+  z-index: 2147483000;
+  box-sizing: border-box;
+  width: 280px;
+  max-width: calc(100vw - 16px);
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--rgr-tip-bg);
+  box-shadow: var(--rgr-tip-shadow);
+  color: var(--rgr-text);
+  font: 400 12px/16px "Google Sans", Roboto, Arial, sans-serif;
+  white-space: normal;
+}
+
+.rgr-tooltip[hidden] {
+  display: none;
+}
+
+.rgr-tooltip .rgr-tip-title {
+  margin-bottom: 6px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.rgr-tooltip .rgr-tip-rows {
+  margin: 0;
+  padding: 0;
+}
+
+.rgr-tooltip .rgr-tip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 0;
+}
+
+.rgr-tooltip .rgr-tip-row dt {
+  margin: 0;
+  color: var(--rgr-muted);
+}
+
+.rgr-tooltip .rgr-tip-row dd {
+  margin: 0;
+  text-align: right;
+}
+
+.rgr-tooltip .rgr-tip-notes {
+  margin: 8px 0 0;
+  padding: 8px 0 0 16px;
+  border-top: 1px solid var(--rgr-border);
+  color: var(--rgr-muted);
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.rgr-tooltip .rgr-tip-notes li {
+  margin: 2px 0;
+}
+
+/* Skeleton: the finished element's own box, so nothing shifts when the result arrives. Its glyphs are hidden and a
+   shimmering bar (0.7em tall, centered on the line) sits where they were. Stars are the real star glyphs, shimmering
+   until they are coloured in. Used by the badge and by the modal headline while reviews load. */
+.rgr-skel-text,
+.rgr-score-loading .rgr-score-value,
+.rgr-score-loading .rgr-score-count,
+.rgr-score-loading .rgr-score-delta {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(90deg, var(--rgr-skel) 25%, var(--rgr-skel-hi) 50%, var(--rgr-skel) 75%) 0 50% / 200% 0.7em repeat-x;
+  border-radius: 0.2em;
+  animation: rgr-shimmer-x 1.4s ease-in-out infinite;
+  user-select: none;
+}
+
+.rgr-score-loading .rgr-score-stars {
+  background: linear-gradient(90deg, var(--rgr-skel) 25%, var(--rgr-skel-hi) 50%, var(--rgr-skel) 75%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+  animation: rgr-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes rgr-shimmer-x {
+  from { background-position: 200% 50%; }
+  to { background-position: -200% 50%; }
+}
+
+@keyframes rgr-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* The result fades in where the skeleton was. */
+.rgr-root.rgr-enter .rgr-badge {
+  animation: rgr-fade-in 0.25s ease-out;
+}
+
+@keyframes rgr-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rgr-skel-text,
+  .rgr-score-loading .rgr-score-value,
+  .rgr-score-loading .rgr-score-count,
+  .rgr-score-loading .rgr-score-delta,
+  .rgr-score-loading .rgr-score-stars,
+  .rgr-root.rgr-enter .rgr-badge {
+    animation: none;
+  }
+}
+
+.rgr-tooltip .rgr-tip-hint {
+  margin-top: 8px;
+  color: var(--rgr-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- Reviews modal */
+
+.rgr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 16px;
+  background: var(--rgr-scrim);
+  color: var(--rgr-text);
+  color-scheme: light dark;
+  font: 400 14px/20px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+/* The panel is the one scroll area (header, summary and reviews scroll together, like Google's
+   own reviews dialog) and its scrollbar is hidden; wheel, trackpad and keyboard still scroll. */
+.rgr-modal-panel {
+  --rgr-pad: 24px;
+  position: relative;
+  box-sizing: border-box;
+  width: min(760px, 100%);
+  /* One fixed size for every state (skeleton, reviews, empty): the loaded modal is exactly as big as the
+     loading one, and long lists scroll inside it. Shrinks to the window on small screens. */
+  height: min(700px, 100%);
+  background: var(--rgr-modal-bg);
+  color: var(--rgr-text);
+  border: 1px solid var(--rgr-modal-border);
+  border-radius: 6px;
+  box-shadow: var(--rgr-tip-shadow);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.rgr-modal-panel::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* The loader drives Google's own reviews list (it scrolls it to load more) while the badge calculates in the
+   background and while this modal is open. Hide Google's dialog and its dimming scrim meanwhile, so the user never
+   sees Google's UI flash, or a modal over a modal. opacity (not display) keeps them laid out and scrollable. */
+html[data-rgr-quiet] [role="dialog"]:not(.rgr-modal-panel),
+[data-rgr-quiet-hide] {
+  opacity: 0 !important;
+}
+
+/* zero-height sticky row: keeps the close button in view without taking layout space */
+.rgr-modal-closebar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  height: 0;
+}
+
+.rgr-modal .rgr-modal-close {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin: 12px 12px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--rgr-chip-bg);
+  color: var(--rgr-text);
+  font: 400 26px/36px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.rgr-modal .rgr-modal-close:hover,
+.rgr-modal .rgr-modal-close:focus-visible {
+  background: var(--rgr-modal-border);
+  outline: none;
+}
+
+.rgr-modal-header {
+  padding: 22px 64px 12px var(--rgr-pad);
+}
+
+.rgr-modal-title {
+  margin: 0;
+  color: var(--rgr-text);
+  font: 400 28px/36px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-modal-subtitle {
+  margin: 2px 0 0;
+  color: var(--rgr-muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.rgr-modal-body {
+  padding: 0 var(--rgr-pad) 24px;
+}
+
+.rgr-summary {
+  padding: 4px 0 14px;
+  border-bottom: 1px solid var(--rgr-modal-border);
+}
+
+.rgr-score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 12px;
+}
+
+.rgr-score-value {
+  font: 400 52px/60px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-score-stars {
+  font-size: 26px;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, var(--rgr-star) var(--rgr-fill, 0%), var(--rgr-skel) var(--rgr-fill, 0%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.rgr-score-count {
+  color: var(--rgr-muted);
+  font-size: 16px;
+}
+
+.rgr-score-delta {
+  color: var(--rgr-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rgr-score[data-rgr-tone="positive"] .rgr-score-delta { color: var(--rgr-positive); }
+.rgr-score[data-rgr-tone="negative"] .rgr-score-delta { color: var(--rgr-negative); }
+
+.rgr-alltime {
+  color: var(--rgr-muted);
+  font-size: 14px;
+}
+
+.rgr-controls {
+  margin-top: 16px;
+}
+
+/* "Show reviews from  [ Last 6 months  v ]" */
+.rgr-window {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--rgr-muted);
+  font: 400 14px/20px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-select-wrap {
+  position: relative;
+  display: inline-flex;
+  color: var(--rgr-muted);
+}
+
+/* our own chevron: the native one is tiny, differs per OS and crowds the text */
+.rgr-select-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-75%) rotate(45deg);
+  pointer-events: none;
+}
+
+.rgr-modal .rgr-select {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  min-width: 168px;
+  height: 36px;
+  margin: 0;
+  padding: 0 40px 0 16px;
+  border: 1px solid var(--rgr-modal-border);
+  border-radius: 18px;
+  background-color: var(--rgr-chip-bg);
+  color: var(--rgr-text);
+  font: 500 14px/20px "Google Sans", Roboto, Arial, sans-serif;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.rgr-modal .rgr-select:hover {
+  border-color: var(--rgr-muted);
+}
+
+.rgr-modal .rgr-select:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+.rgr-modal .rgr-select option {
+  background: var(--rgr-modal-bg);
+  color: var(--rgr-text);
+}
+
+.rgr-status {
+  margin: 10px 0 0;
+  color: var(--rgr-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.rgr-status[data-loading="true"] {
+  animation: rgr-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes rgr-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.rgr-list {
+  padding-top: 4px;
+}
+
+/* A cloned Google review card. Read-only: no clicks reach Google's handlers. */
+.rgr-review {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rgr-modal-border);
+  color: var(--rgr-text);
+  font-size: 14px;
+  line-height: 20px;
+  pointer-events: none;
+}
+
+/* Maps-style card: its root carries the side padding and its photo grid bleeds out of it,
+   so the card spans the panel edge to edge. */
+.rgr-review-bleed {
+  margin-right: calc(-1 * var(--rgr-pad));
+  margin-left: calc(-1 * var(--rgr-pad));
+}
+
+.rgr-review [aria-label^="Review options"],
+.rgr-review [aria-label^="Share review"],
+.rgr-review [aria-label^="Actions for"],
+.rgr-review [aria-label^="Like"],
+.rgr-review [aria-label^="Read more"],
+.rgr-review [role="menu"] {
+  display: none !important;
+}
+
+.rgr-empty {
+  padding: 32px 0;
+  color: var(--rgr-muted);
+  text-align: center;
+}
+
+/* Skeleton review card: the shape of a real one (avatar, name + meta, stars row, three text lines on the same 20px
+   line grid), so the list is about as tall while loading as when the cards arrive. */
+.rgr-review-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rgr-skel-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.rgr-skel-meta-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.rgr-skel-row {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.rgr-modal .rgr-skel-bar {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--rgr-skel) 25%, var(--rgr-skel-hi) 50%, var(--rgr-skel) 75%);
+  background-size: 200% 100%;
+  animation: rgr-shimmer 1.4s ease-in-out infinite;
+}
+
+.rgr-modal .rgr-skel-avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; }
+.rgr-modal .rgr-skel-name { width: 140px; }
+.rgr-modal .rgr-skel-meta { width: 220px; max-width: 100%; }
+.rgr-modal .rgr-skel-rating { width: 96px; height: 14px; }
+.rgr-modal .rgr-skel-line-1 { width: 100%; }
+.rgr-modal .rgr-skel-line-2 { width: 92%; }
+.rgr-modal .rgr-skel-line-3 { width: 60%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rgr-status[data-loading="true"],
+  .rgr-modal .rgr-skel-bar {
+    animation: none;
+  }
+}
+
+/* The modal follows Google's own theme (read from the page background), not just the OS's. */
+.rgr-modal[data-rgr-theme="light"] {
+  --rgr-modal-bg: #ffffff;
+  --rgr-modal-border: #dadce0;
+  --rgr-scrim: rgba(32, 33, 36, 0.6);
+  --rgr-chip-bg: #f1f3f4;
+  --rgr-text: #3c4043;
+  --rgr-muted: #5f6368;
+  --rgr-star: #f9ab00;
+  --rgr-positive: #188038;
+  --rgr-negative: #d93025;
+  --rgr-skel: #dadce0;
+  --rgr-skel-hi: #f1f3f4;
+  --rgr-tip-shadow: 0 2px 8px rgba(60, 64, 67, 0.3), 0 1px 2px rgba(60, 64, 67, 0.3);
+  color-scheme: light;
+}
+
+.rgr-modal[data-rgr-theme="dark"] {
+  --rgr-modal-bg: #202124;
+  --rgr-modal-border: #3c4043;
+  --rgr-scrim: rgba(0, 0, 0, 0.65);
+  --rgr-chip-bg: #303134;
+  --rgr-text: #e8eaed;
+  --rgr-muted: #9aa0a6;
+  --rgr-star: #fdd663;
+  --rgr-positive: #81c995;
+  --rgr-negative: #f28b82;
+  --rgr-skel: #4a4d51;
+  --rgr-skel-hi: #6b6f74;
+  --rgr-tip-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+.rgr-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 14px;
+}
+
+.rgr-status-row .rgr-status {
+  margin: 0;
+}
+
+.rgr-modal .rgr-load-more {
+  margin: 0;
+  padding: 4px 12px;
+  border: 1px solid var(--rgr-modal-border);
+  border-radius: 14px;
+  background: var(--rgr-chip-bg);
+  color: var(--rgr-text);
+  font: 500 12px/16px "Google Sans", Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.rgr-modal .rgr-load-more[hidden] {
+  display: none;
+}
+
+.rgr-modal .rgr-load-more:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 1px;
+}
+
+/* ---------------------------------------------------------------- Loading notice */
+
+/* Shown over the page while the extension reads the reviews in the background and the page is paused. */
+.rgr-notice {
+  --rgr-accent: #1a73e8;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 16px;
+  background: var(--rgr-scrim);
+  color: var(--rgr-text);
+  font: 400 14px/20px "Google Sans", Roboto, Arial, sans-serif;
+  animation: rgr-fade-in 0.2s ease-out;
+}
+
+.rgr-notice[data-rgr-theme="dark"] {
+  --rgr-accent: #8ab4f8;
+}
+
+.rgr-notice .rgr-notice-panel {
+  box-sizing: border-box;
+  width: min(460px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid var(--rgr-modal-border);
+  border-radius: 6px;
+  background: var(--rgr-modal-bg);
+  box-shadow: var(--rgr-tip-shadow);
+}
+
+.rgr-notice .rgr-notice-title {
+  margin: 0;
+  color: var(--rgr-text);
+  font: 500 20px/28px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-notice .rgr-notice-lead {
+  margin: 8px 0 0;
+  color: var(--rgr-text);
+}
+
+/* Indeterminate: how many reviews there are to read is not known up front. */
+.rgr-notice .rgr-notice-progress {
+  position: relative;
+  height: 4px;
+  margin: 16px 0 20px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--rgr-skel);
+}
+
+.rgr-notice .rgr-notice-progress::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  border-radius: 2px;
+  background: var(--rgr-accent);
+  animation: rgr-notice-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes rgr-notice-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+
+.rgr-notice .rgr-notice-why {
+  margin: 0 0 4px;
+  color: var(--rgr-text);
+  font: 500 14px/20px "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.rgr-notice .rgr-notice-reason {
+  margin: 8px 0 0;
+  color: var(--rgr-muted);
+}
+
+.rgr-notice .rgr-notice-footnote {
+  margin: 16px 0 0;
+  color: var(--rgr-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.rgr-notice .rgr-notice-panel:focus {
+  outline: none; /* focused by script so the dialog is announced; there is nothing to operate */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rgr-notice,
+  .rgr-notice .rgr-notice-progress::after {
+    animation: none;
+  }
+}

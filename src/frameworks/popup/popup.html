@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recent Reviews for Google Search &amp; Maps</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <header class="brand">
+        <img class="brand-icon" src="../../../icons/icon-48.png" alt="" width="36" height="36" />
+        <div>
+          <h1>Recent Reviews</h1>
+          <p class="tagline">For Google Search and Maps</p>
+        </div>
+      </header>
+
+      <section class="card" aria-label="Settings">
+        <label class="row" for="enabled-search">
+          <span class="row-text">
+            <span class="row-title">Google Search</span>
+            <span class="row-sub">Show the badge on search results</span>
+          </span>
+          <span class="toggle">
+            <input id="enabled-search" type="checkbox" role="switch" />
+            <span class="track" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="row" for="enabled-maps">
+          <span class="row-text">
+            <span class="row-title">Google Maps</span>
+            <span class="row-sub">Show the badge on Maps places</span>
+          </span>
+          <span class="toggle">
+            <input id="enabled-maps" type="checkbox" role="switch" />
+            <span class="track" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="row" for="max-months">
+          <span class="row-text">
+            <span class="row-title">Longest window</span>
+            <span class="row-sub" id="strip-preview"></span>
+          </span>
+          <span class="select-wrap">
+            <select id="max-months"></select>
+          </span>
+        </label>
+
+        <label class="row" for="window">
+          <span class="row-text">
+            <span class="row-title">Time window</span>
+            <span class="row-sub">Reviews shown when you open the list</span>
+          </span>
+          <span class="select-wrap">
+            <select id="window">
+              <option value="1_WEEK">Last week</option>
+              <option value="1_MONTH">Last month</option>
+              <option value="3_MONTHS">Last 3 months</option>
+              <option value="6_MONTHS">Last 6 months</option>
+              <option value="1_YEAR">Last year</option>
+            </select>
+          </span>
+        </label>
+      </section>
+
+      <p id="status" role="status" aria-live="polite"></p>
+
+      <p class="hint">
+        <strong>How it works</strong>
+        Click the badge next to a place's rating to see the reviews behind the numbers. You can pick a window there too &mdash; it changes the rating on the fly.
+      </p>
+    </main>
+    <script type="module" src="popupMain.js"></script>
+  </body>
+</html>

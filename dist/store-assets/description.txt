@@ -1,0 +1,22 @@
+See how a place is doing lately, not just over its lifetime.
+
+Google shows one all-time star rating for a restaurant, shop or hotel. Recent Reviews for Google Search & Maps adds a small strip right next to it with the average of only the most recent reviews (by default the last 1, 3 and 6 months), so you can tell at a glance whether a place is improving or slipping.
+
+WHAT YOU GET
+• A strip next to the rating on Google Search and Google Maps place panels: the recent average, how many reviews it is based on, and an arrow showing whether recent reviews are above or below the all-time rating.
+• Click it to open a list of just the reviews that were counted, with a dropdown to change the window from a week up to 11 months.
+• Settings in the toolbar popup: turn the badge on or off separately for Search and for Maps, choose the longest window shown (2 to 11 months), and choose which window the reviews list opens on.
+• Follows Google's light and dark theme on Search.
+
+HOW IT WORKS
+Google doesn't offer a free way to get reviews by date, so the extension reads the reviews already on the page. It opens Google's own reviews list, sorts it by Newest, and scrolls it a batch at a time, the way you would, then averages the reviews in each window. This takes a few seconds (longer for places with thousands of reviews). While it runs, the page is paused behind a short message explaining why. Everything happens in your browser.
+
+GOOD TO KNOW
+• Only reviews that were loaded are counted, and Google shows rounded dates ("3 weeks ago"), so each window is approximate.
+• English-language Google only: the extension reads dates like "2 weeks ago".
+• Desktop only: Google's phone layout is not supported.
+
+PRIVACY
+No accounts, no servers, no analytics. The extension does not collect or send any data. Your settings are saved with Chrome's extension storage.
+
+Not affiliated with, endorsed by, or sponsored by Google. Google, Google Search and Google Maps are trademarks of Google LLC.

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recent Google Reviews — demo harness</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    :root { color-scheme: light dark; }
+    body { margin: 24px; font: 14px/20px Roboto, Arial, sans-serif; background: #fff; color: #202124; }
+    @media (prefers-color-scheme: dark) { body { background: #202124; color: #e8eaed; } }
+    .controls { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+    .controls button, .controls select { font: inherit; padding: 4px 10px; }
+    #rhs { max-width: 420px; }
+    .title { font-size: 28px; line-height: 36px; }
+    .meta { color: #70757a; }
+    .stars { color: #fbbc04; letter-spacing: 1px; }
+    a { color: #1a73e8; }
+    @media (prefers-color-scheme: dark) { a { color: #8ab4f8; } .meta { color: #9aa0a6; } }
+    .hdr { height: 92px; overflow: hidden; }
+    .photos { height: 110px; border-radius: 16px; background: #5f6368; }
+    .rev { border-top: 1px solid #8884; padding: 10px 0; }
+    .rev p { margin: 4px 0 0; }
+    code { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h3>Recent Google Reviews — demo harness</h3>
+  <p class="meta">
+    Fake place panel with the same markup shapes as live Google, driven by the <em>real</em>
+    controller, DAO, presenter and renderer. Serve the repo root (e.g. <code>python3 -m http.server</code>)
+    and open <code>/dev/demo.html</code>.
+  </p>
+
+  <div class="controls">
+    <button id="load">Load 10 reviews</button>
+    <button id="clear">Clear reviews (list swap)</button>
+    <button id="bg">Simulate background load (6s)</button>
+    <label>Longest
+      <select id="mm"><option value="2">2 months</option><option value="3">3 months</option><option value="4">4 months</option><option value="5">5 months</option><option value="6" selected>6 months</option><option value="7">7 months</option><option value="8">8 months</option><option value="9">9 months</option><option value="10">10 months</option><option value="11">11 months</option></select>
+    </label>
+    <label>Window
+      <select id="tw"><option value="1_WEEK">Last week</option><option value="1_MONTH">Last month</option><option value="2_MONTHS">Last 2 months</option><option value="3_MONTHS">Last 3 months</option><option value="4_MONTHS">Last 4 months</option><option value="5_MONTHS">Last 5 months</option><option value="6_MONTHS" selected>Last 6 months</option><option value="7_MONTHS">Last 7 months</option><option value="8_MONTHS">Last 8 months</option><option value="9_MONTHS">Last 9 months</option><option value="10_MONTHS">Last 10 months</option><option value="11_MONTHS">Last 11 months</option></select>
+    </label>
+  </div>
+
+  <div id="rhs">
+    <!-- Like Google's header: a fixed-height block with spare room, and a photo grid right after it. -->
+    <div class="hdr">
+    <div data-attrid="title" class="title">Krasi</div>
+    <div data-attrid="subtitle">
+      <div id="row">
+        <span>4.6</span>
+        <span role="img" aria-label="Rated 4.6 out of 5," class="stars">★★★★★</span>
+        <span><a role="button" href="#"><span>1,238 Google reviews</span></a></span><br />
+        <span class="meta">$40–90 · Greek restaurant</span>
+      </div>
+    </div>
+    </div>
+    <div class="photos"></div>
+    <p class="meta">48 Gloucester St, Boston, MA 02115</p>
+    <div id="list"></div>
+  </div>
+
+  <script type="module">
+    import { ContentScriptController } from '../src/frameworks/content/ContentScriptController.js';
+    import { GoogleDomReviewDao } from '../src/adapters/dao/GoogleDomReviewDao.js';
+    import { CalculateRecentRatingUseCase } from '../src/usecases/CalculateRecentRatingUseCase.js';
+    import { RatingBadgePresenter } from '../src/adapters/presenters/RatingBadgePresenter.js';
+    import { BadgeDomRenderer } from '../src/frameworks/ui/BadgeDomRenderer.js';
+    import { CachingGoogleReviewSource } from '../src/adapters/dao/CachingGoogleReviewSource.js';
+    import { LoadReviewsUseCase } from '../src/usecases/LoadReviewsUseCase.js';
+    import { ReviewsModalPresenter } from '../src/adapters/presenters/ReviewsModalPresenter.js';
+    import { ReviewsModalRenderer } from '../src/frameworks/ui/ReviewsModalRenderer.js';
+    import { ReviewsModalController } from '../src/frameworks/content/ReviewsModalController.js';
+    import { LoadingNoticePresenter } from '../src/adapters/presenters/LoadingNoticePresenter.js';
+    import { LoadingNoticeRenderer } from '../src/frameworks/ui/LoadingNoticeRenderer.js';
+
+    const RATINGS = [5, 5, 4, 5, 5, 4, 5, 5, 4, 3];
+    const WHEN = ['2 days ago', 'a week ago', '2 weeks ago', '3 weeks ago', 'a month ago', '2 months ago',
+      '3 months ago', '5 months ago', '8 months ago', 'a year ago'];
+    const list = document.getElementById('list');
+
+    const makeCard = (r, when, i) => {
+      const el = document.createElement('div');
+      el.className = 'rev';
+      el.dataset.reviewId = `demo-${i}`;
+      const star = document.createElement('span');
+      star.className = 'stars';
+      star.setAttribute('role', 'img');
+      star.setAttribute('aria-label', `Rated ${r}.0 out of 5,`);
+      star.textContent = '★'.repeat(r) + '☆'.repeat(5 - r);
+      const time = document.createElement('span');
+      time.className = 'meta';
+      time.textContent = ` ${when}`;
+      const p = document.createElement('p');
+      p.textContent = `Sample review text #${i + 1}.`;
+      el.append(star, time, p);
+      return el;
+    };
+
+    document.getElementById('load').onclick = () => {
+      list.replaceChildren(...RATINGS.map((r, i) => makeCard(r, WHEN[i], i)));
+    };
+    document.getElementById('clear').onclick = () => list.replaceChildren();
+
+    let settings = { searchEnabled: true, mapsEnabled: true, timeWindow: '6_MONTHS', maxMonths: 6 };
+    let notify = () => {};
+    document.getElementById('mm').onchange = (e) => { settings = { ...settings, maxMonths: Number(e.target.value) }; notify(); };
+    document.getElementById('tw').onchange = (e) => { settings = { ...settings, timeWindow: e.target.value }; notify(); };
+
+    const dao = new GoogleDomReviewDao({ document });
+    const reviewSource = new CachingGoogleReviewSource({ dao });
+    const calculateUseCase = new CalculateRecentRatingUseCase({ reviewSource });
+    // No Google behind this page, so a stand-in for its lazy list: reviews arrive a page (10) at a time,
+    // newest first, each page after a short delay. Click the badge to watch the loading states.
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const relative = (days) => {
+      if (days < 2) return 'a day ago';
+      if (days < 7) return `${days} days ago`;
+      if (days < 14) return 'a week ago';
+      if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+      const months = Math.floor(days / 30);
+      return months === 1 ? 'a month ago' : `${months} months ago`;
+    };
+    const ALL = Array.from({ length: 80 }, (_, i) => ({
+      rating: [5, 5, 4, 5, 3, 5, 4, 5, 2, 5][i % 10],
+      when: relative(1 + Math.round(i * 3.2)),
+    }));
+    let revealed = 0;
+    const showCards = (count) => {
+      revealed = Math.min(count, ALL.length);
+      list.replaceChildren(...ALL.slice(0, revealed).map(({ rating, when }, i) => makeCard(rating, when, i)));
+    };
+    const reviewLoader = {
+      open: async () => { await sleep(700); showCards(10); },
+      loadMore: async () => {
+        await sleep(650);
+        if (revealed >= ALL.length) return false;
+        showCards(revealed + 10);
+        return true;
+      },
+      close: async () => { list.replaceChildren(); revealed = 0; }, // like Google's list closing
+      isOpen: () => revealed > 0,
+    };
+    const loadUseCase = new LoadReviewsUseCase({ reviewSource, reviewLoader });
+
+    let modal = null;
+    window.controller = new ContentScriptController({
+      window,
+      document,
+      settingsUseCase: {
+        getSettings: async () => settings,
+        subscribe: (cb) => { notify = () => cb(settings); return () => {}; },
+      },
+      calculateUseCase,
+      presenter: new RatingBadgePresenter(),
+      notice: {
+        presenter: new LoadingNoticePresenter(),
+        renderer: new LoadingNoticeRenderer({ window, document }),
+      },
+      renderer: new BadgeDomRenderer({
+        window, document, locateAnchor: () => dao.locateBadgeAnchor(), onActivate: () => modal?.open(),
+      }),
+    });
+    modal = new ReviewsModalController({
+      calculateUseCase,
+      loadUseCase,
+      presenter: new ReviewsModalPresenter(),
+      renderer: new ReviewsModalRenderer({
+        window, document,
+        cloneCard: (id) => reviewSource.cardFor(id),
+        onWindowChange: (windowId) => modal.changeWindow(windowId),
+        onClose: () => modal.close(),
+        onLoadMore: () => modal.loadMore(),
+      }),
+      getTimeWindow: () => window.controller.settings.timeWindow,
+      setTimeWindow: (windowId) => window.controller.setTimeWindow(windowId),
+      onLoadStateChange: (state) => window.controller.setLoadState(state),
+      onVisibilityChange: () => window.controller.syncNotice(),
+    });
+    // The harness has no background calculation: this stands in for one, to see the "page is paused" notice.
+    document.getElementById('bg').onclick = () => {
+      window.controller.setLoadState('loading');
+      setTimeout(() => window.controller.setLoadState('idle'), 6000);
+    };
+    window.controller.attachModal(modal);
+    window.modal = modal;
+    window.controller.start();
+  </script>
+</body>
+</html>

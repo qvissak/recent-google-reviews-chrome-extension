@@ -1,0 +1,14 @@
+{
+  "name": "recent-google-reviews",
+  "version": "1.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Chrome MV3 extension that adds a recent-reviews average next to Google's all-time rating.",
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "package": "bash scripts/package.sh"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}

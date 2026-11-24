@@ -1,0 +1,10 @@
+node_modules/
+dist/*.zip
+.DS_Store
+
+# Local-only files
+sync-ai-rules.sh
+.claude/settings.local.json
+
+# Development screenshots of real Google pages: they show a signed-in profile photo and real reviewers
+docs/examples/
